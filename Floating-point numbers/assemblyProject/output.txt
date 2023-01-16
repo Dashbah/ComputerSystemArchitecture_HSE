@@ -1,0 +1,3 @@
+
+Result: -11.999700
+Expected result: -12.000000
