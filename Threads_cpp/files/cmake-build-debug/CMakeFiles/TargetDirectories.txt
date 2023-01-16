@@ -1,0 +1,3 @@
+/Users/dashbah/Desktop/repo/Bakhankova_Asm_HW4/cmake-build-debug/CMakeFiles/Bakhankova_Asm_HW4.dir
+/Users/dashbah/Desktop/repo/Bakhankova_Asm_HW4/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/dashbah/Desktop/repo/Bakhankova_Asm_HW4/cmake-build-debug/CMakeFiles/rebuild_cache.dir
