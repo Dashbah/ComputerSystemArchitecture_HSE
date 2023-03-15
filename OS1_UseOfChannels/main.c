@@ -121,7 +121,8 @@ int main(int argc, char **argv) {
 
         // обработка
         char array[read_bytes];
-        func(str_buf,array);
+        int numOfBytes;
+        func(str_buf,array, &numOfBytes);
 
 //        // конвертируем в char*
 //        char result[size];
@@ -139,7 +140,7 @@ int main(int argc, char **argv) {
 //            printf("Substring not found!");
 //        }
         // передача
-        write(file_d[1], array, size);
+        write(file_d[1], array, numOfBytes);
     } else { /* Child 3 process */
         int status;
         waitpid(child_2, &status, 0);

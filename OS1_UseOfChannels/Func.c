@@ -3,7 +3,7 @@
 //
 #include <string.h>
 
-void func(const char *string, char *result) {
+void func(const char *string, char *result ,int *num) {
     // char result[5000];
     int result_len = 0;
     int set_plus = 1;
@@ -18,5 +18,6 @@ void func(const char *string, char *result) {
             }
         }
     }
+    *num = result_len;
     // return result;
 }
