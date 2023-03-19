@@ -1,17 +1,21 @@
+//
+// Created by Dashbah on 19.03.2023.
+//
 #include <stdio.h>
-#include "../Func.c"
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/fcntl.h>
 #include <string.h>
+#include "../Func.c"
 
 const int size = 5000;
 
 int main(int argc, char **argv) {
-    int file_d[2];
+    int fd;
+    char name[] = "main2.fifo";
 
-    if (pipe(file_d) < 0) {
-        printf("Can\'t open pipe\n");
+    if (mknod(name, S_IFIFO | 0666, 0) < 0) {
+        printf("Can\'t create FIFO\n");
         exit(-1);
     }
 
@@ -23,12 +27,8 @@ int main(int argc, char **argv) {
     char *input_file = argv[1];
     char *output_file = argv[2];
 
-    //    papa - c1 - c3
-    //         - c2
-    // pid_t child = fork();
     int child_1 = fork();
     int child_2 = fork();
-    // int child_2;
 
     if (child_1 < 0 || child_2 < 0) {
         printf("Can\'t fork children\n");
@@ -36,17 +36,11 @@ int main(int argc, char **argv) {
     }
 
     if (child_1 > 0 && child_2 > 0) { /* Parent process */
-        // int status;
-        // wait(&status);
-
-        //    papa - c1 - c2 - c3
-        // child_2 = fork();
-
         wait(NULL);
         wait(NULL);
         wait(NULL);
-    } else if (child_1 == 0 && child_2 > 0) { /* Child 1 process */
-        int fd;
+    } else if (child_1 == 0 && child_2 > 0) /* Child 1 process */
+    {
         char buffer[size];
         ssize_t read_bytes;
 
@@ -58,42 +52,56 @@ int main(int argc, char **argv) {
         read_bytes = read(fd, buffer, size);
 
         if (read_bytes == -1) {
-            printf("Can\'t read this file\n");
+            printf("Can\'t write this file\n");
             exit(-1);
         }
 
-//        if (read_bytes > 8000) {
-//            printf("File is too big!");
-//            exit(-1);
-//        }
+        // запись в main.fifo
+        if ((fd = open(name, O_WRONLY)) < 0) {
+            printf("Can\'t open FIFO for writting\n");
+            exit(-1);
+        }
+        write(fd, buffer, read_bytes);
 
-        write(file_d[1], buffer, read_bytes);
-
-    } else if (child_1 > 0 && child_2 == 0) { /* Child 2 process */
-        // int status;
-
-        // стремный чел
+    } else if (child_1 > 0 && child_2 == 0) /* Child 2 process */
+    {
         waitpid(child_1, NULL, 0);
 
+        //
         char str_buf[size];
-        size_t read_bytes = read(file_d[0], str_buf, size);
+
+        if ((fd = open(name, O_RDONLY)) < 0) {
+            printf("Can\'t open FIFO for reading\n");
+            exit(-1);
+        }
+
+        size_t read_bytes = read(fd, str_buf, size);
 
         // обработка
         char array[read_bytes];
         int numOfBytes;
-        func(str_buf,array, &numOfBytes);
+        func(str_buf, array, &numOfBytes);
+
+
 
         // передача
-        write(file_d[1], array, numOfBytes);
+        if ((fd = open(name, O_WRONLY)) < 0) {
+            printf("Can\'t open FIFO for writting\n");
+            exit(-1);
+        }
+
+        write(fd, array, numOfBytes);
+
     } else { /* Child 3 process */
-        // int status;
         waitpid(child_2, NULL, 0);
 
         char buf[size];
 
-        size_t read_bytes = read(file_d[0], buf, size);
-
-        int fd;
+        if ((fd = open(name, O_RDONLY)) < 0) {
+            printf("Can\'t open FIFO for reading\n");
+            exit(-1);
+        }
+        size_t read_bytes = read(fd, buf, size);
 
         if ((fd = open(output_file, O_WRONLY | O_CREAT, 0666)) < 0) {
             printf("Can\'t open file\n");
@@ -102,5 +110,6 @@ int main(int argc, char **argv) {
 
         write(fd, buf, read_bytes);
     }
+
     return 0;
 }
