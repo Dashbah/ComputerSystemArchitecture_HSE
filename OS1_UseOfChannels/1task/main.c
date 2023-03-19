@@ -23,12 +23,8 @@ int main(int argc, char **argv) {
     char *input_file = argv[1];
     char *output_file = argv[2];
 
-    //    papa - c1 - c3
-    //         - c2
-    // pid_t child = fork();
     int child_1 = fork();
     int child_2 = fork();
-    // int child_2;
 
     if (child_1 < 0 || child_2 < 0) {
         printf("Can\'t fork children\n");
@@ -36,12 +32,6 @@ int main(int argc, char **argv) {
     }
 
     if (child_1 > 0 && child_2 > 0) { /* Parent process */
-        // int status;
-        // wait(&status);
-
-        //    papa - c1 - c2 - c3
-        // child_2 = fork();
-
         wait(NULL);
         wait(NULL);
         wait(NULL);
@@ -62,31 +52,20 @@ int main(int argc, char **argv) {
             exit(-1);
         }
 
-//        if (read_bytes > 8000) {
-//            printf("File is too big!");
-//            exit(-1);
-//        }
-
         write(file_d[1], buffer, read_bytes);
 
     } else if (child_1 > 0 && child_2 == 0) { /* Child 2 process */
-        // int status;
-
-        // стремный чел
         waitpid(child_1, NULL, 0);
 
         char str_buf[size];
         size_t read_bytes = read(file_d[0], str_buf, size);
-
-        // обработка
+        
         char array[read_bytes];
         int numOfBytes;
         func(str_buf,array, &numOfBytes);
 
-        // передача
         write(file_d[1], array, numOfBytes);
     } else { /* Child 3 process */
-        // int status;
         waitpid(child_2, NULL, 0);
 
         char buf[size];
