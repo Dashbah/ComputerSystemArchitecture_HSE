@@ -11,16 +11,17 @@
 #define SHARED_MEMORY_SIZE (sizeof(sem_t) * NUM_DEPARTMENTS)
 
 void salesperson(int id, sem_t **semaphores, sem_t *shared_memory) {
-    int i, department;
+    // int i, department;
     printf("Salesperson %d starts working.\n", id);
 }
 
 void customer(int id, sem_t **semaphores, sem_t *shared_memory) {
-    int i, department;
+    int i;
     printf("Customer %d enters the store.\n", id);
 
     // choose random department
-    department = rand() % NUM_DEPARTMENTS;
+    int department = rand() % NUM_DEPARTMENTS + 1;
+    // printf(department);
 
     // wait for salesperson to be available
     // int value;
@@ -30,11 +31,11 @@ void customer(int id, sem_t **semaphores, sem_t *shared_memory) {
     //  }
     sem_wait(semaphores[department]);
 
+    // release salesperson
+    sem_post(shared_memory + department);
     // purchase item from department
     printf("Customer %d purchases item from department %d.\n", id, department);
 
-    // release salesperson
-    sem_post(shared_memory + department);
 
     while (1) {
         // wait for customer
@@ -58,42 +59,6 @@ void customer(int id, sem_t **semaphores, sem_t *shared_memory) {
         sem_post(semaphores[i]);
     }
 }
-
-//void customer(int id, sem_t **semaphores, sem_t *shared_memory) {
-//    int i, department;
-//    printf("Customer %d enters the store.\n", id);
-//
-//    // choose random department
-//    department = rand() % NUM_DEPARTMENTS;
-//
-//    // wait for salesperson to be available
-//    sem_wait(semaphores[department]);
-//
-//    // purchase item from department
-//    printf("Customer %d purchases item from department %d.\n", id, department);
-//
-//    // release salesperson
-//    sem_post(shared_memory + department);
-//
-//
-//    while (1) {
-//        // wait for customer
-//        for (i = 0; i < NUM_DEPARTMENTS; i++) {
-//            sem_wait(shared_memory + i);
-//        }
-//
-//        // serve customer
-//        for (i = 0; i < NUM_DEPARTMENTS; i++) {
-//            if (sem_trywait(semaphores[i]) == 0) {
-//                printf("Salesperson %d serves customer in department %d.\n", id, i);
-//                break;
-//            }
-//        }
-//
-//        // release department semaphore
-//        sem_post(semaphores[i]);
-//    }
-//}
 
 int main(void) {
     int i;
