@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.23)
-project(HW4 C)
+project(HW5 C)
 
 set(CMAKE_C_STANDARD 17)
 
-add_executable(HW4 main.c re)
+add_executable(HW5 writer.c reader.c)
