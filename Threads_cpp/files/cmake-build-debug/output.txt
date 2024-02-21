@@ -1,3 +1,0 @@
-
-Result: 4.994747
-Expected result: 4.994753
